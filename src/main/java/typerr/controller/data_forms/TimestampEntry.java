@@ -1,4 +1,7 @@
 package typerr.controller.data_forms;
 
-public class TimestampEntry {
-}
+public record TimestampEntry(
+        String key,
+        long timestamp,
+        boolean correct
+) {}

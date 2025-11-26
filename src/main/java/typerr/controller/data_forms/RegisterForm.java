@@ -3,7 +3,7 @@ package typerr.controller.data_forms;
 import lombok.Data;
 
 @Data
-public class RegisterRequest {
+public class RegisterForm {
     private String username;
     private String email;
     private String password;
