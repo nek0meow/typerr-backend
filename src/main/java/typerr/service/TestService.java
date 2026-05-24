@@ -3,12 +3,11 @@ package typerr.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
-import typerr.controller.data_forms.TestDataRequest;
+import typerr.controller.dto.TestDataRequest;
 import typerr.model.TestResult;
 import typerr.model.TestResultTimestamp;
 import typerr.model.User;
 import typerr.repository.TestResultRepository;
-import typerr.repository.TestResultTimestampRepository;
 
 import java.time.Instant;
 import java.util.Date;

@@ -1,4 +1,4 @@
-package typerr.controller.data_forms;
+package typerr.controller.dto;
 
 public record TimestampEntry(
         String key,

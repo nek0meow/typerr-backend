@@ -1,14 +1,18 @@
 package typerr.service;
 
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import typerr.model.Role;
 import typerr.model.User;
 import typerr.repository.UserRepository;
 
 import java.util.Optional;
 
 @Service
-public class UserService {
+public class UserService implements UserDetailsService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
@@ -29,6 +33,7 @@ public class UserService {
         user.setUsername(username);
         user.setEmail(email);
         user.setPassword(passwordEncoder.encode(password));
+        user.setRole(Role.ROLE_USER);
 
         return userRepository.save(user);
     }
@@ -40,5 +45,23 @@ public class UserService {
             throw new RuntimeException("Login error: email does not exist or password is incorrect");
         }
         return user.get();
+    }
+
+    public User create(User user) {
+        if (userRepository.existsByEmail(user.getUsername())) {
+            throw new RuntimeException("Login error: user with this email already exists");
+        }
+
+        if (userRepository.existsByUsername(user.getEmail())) {
+            throw new RuntimeException("Login error: user with this username already exists");
+        }
+
+        return userRepository.save(user);
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        return userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("Login error: user with this username already exists"));
     }
 }

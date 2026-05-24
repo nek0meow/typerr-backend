@@ -1,22 +1,21 @@
 package typerr.controller;
 
-import io.jsonwebtoken.Jwt;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.web.server.Cookie;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
-import typerr.controller.data_forms.LoginForm;
-import typerr.controller.data_forms.RegisterForm;
+import typerr.controller.dto.LoginDTO;
+import typerr.controller.dto.RegisterDTO;
 import typerr.model.User;
 import typerr.repository.UserRepository;
 import typerr.service.JwtService;
 import typerr.service.UserService;
 
 import java.util.Map;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -30,30 +29,32 @@ public class AuthController {
     private UserRepository userRepository;
 
     @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody RegisterForm data) {
+    public ResponseEntity<?> register(@RequestBody RegisterDTO data) {
         userService.registerUser(data.getUsername(), data.getEmail(), data.getPassword());
         return ResponseEntity.ok(Map.of("message", "Register success"));
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginForm data) {
+    public ResponseEntity<?> login(@RequestBody LoginDTO data) {
         User user = userService.loginUser(data.getEmail(), data.getPassword());
         String token = jwtService.generateToken(user, data.isRememberMe());
+
 
         ResponseCookie cookie = ResponseCookie.from("jwt", token)
                 .httpOnly(true)
                 .secure(false)                // true in prod (HTTPS)
                 .path("/")
-                .maxAge(data.isRememberMe() ? 7 * 24 * 60 * 60 : 3600)
+                .maxAge(data.isRememberMe() ?
+                        JwtService.REMEMBER_TIME_LONG / 1000
+                        :
+                        JwtService.REMEMBER_TIME_SHORT / 1000)
                 .sameSite("Strict")
                 .build();
+        System.out.println(data.isRememberMe());
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, cookie.toString())
-                .body(Map.of(
-                        "message", "Login success",
-                        "token", token
-                ));
+                .body(Map.of("message", "Login success"));
     }
 
     @GetMapping("/me")
@@ -64,12 +65,12 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
-        Long userId = jwtService.extractUserId(token);
-        User user = userRepository.findById(userId)
+        String username = jwtService.getUsername(token);
+        User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not found"));
 
         return ResponseEntity.ok(Map.of(
-                "username", user.getUsername(),
+                "username", username,
                 "email", user.getEmail()
         ));
     }

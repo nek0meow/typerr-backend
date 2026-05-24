@@ -3,7 +3,7 @@ package typerr.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import typerr.controller.data_forms.TestResultSimpleData;
+import typerr.controller.dto.TestResultSimpleData;
 import typerr.model.TestResult;
 import typerr.repository.TestResultRepository;
 
