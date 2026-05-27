@@ -17,6 +17,8 @@ public interface TestResultRepository extends JpaRepository<TestResult, Long> {
     // get oldest N tests
     @Query("SELECT t FROM TestResult t WHERE t.user = :user ORDER BY t.id ASC")
     List<TestResult> findTopByUserOrderByIdAsc(@Param("user") User user, Pageable pageable);
+    @Query("SELECT t FROM TestResult t WHERE t.user = :user ORDER BY t.savedAt DESC, t.id DESC")
+    List<TestResult> findRecentByUser(@Param("user") User user, Pageable pageable);
     List<TestResult> findByUserId(Long userId);
     List<TestResult> findByUserIdOrderByIdDesc(Long userId);
 }

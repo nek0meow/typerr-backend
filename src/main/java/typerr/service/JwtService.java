@@ -25,7 +25,7 @@ public class JwtService {
 
     @Value("${jwt.secret}")
     private String SECRET;
-    public static final long REMEMBER_TIME_LONG = TimeUnit.DAYS.toMillis(2);
+    public static final long REMEMBER_TIME_LONG = TimeUnit.DAYS.toMillis(7);
     public static final long REMEMBER_TIME_SHORT = TimeUnit.MINUTES.toMillis(5);
 
     public String generateToken(UserDetails userDetails, Map<String, Object> extraClaims, boolean isRememberMe) {

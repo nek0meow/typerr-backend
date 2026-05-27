@@ -21,6 +21,7 @@ public class ProfileService {
                 .map(r -> new TestResultSimpleData(
                         r.getId(),
                         r.getWpm(),
+                        r.getAccuracy(),
                         r.getTime(),
                         r.getSavedAt()
                 ))
